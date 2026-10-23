@@ -1,0 +1,55 @@
+<%- include('../partials/head') %>
+<body class="app-page">
+  <%- include('../partials/topbar') %>
+  <main class="wrap wide">
+    <%- include('../partials/flash') %>
+    <h1 class="page-title">Team roster</h1>
+    <p class="page-sub">Everyone with an account, newest first.</p>
+
+    <div class="stats">
+      <div><strong><%= stats.total %></strong><span>People</span></div>
+      <div><strong><%= stats.employees %></strong><span>Employees</span></div>
+      <div><strong><%= stats.admins %></strong><span>Admins</span></div>
+      <div><strong><%= stats.inactive %></strong><span>Deactivated</span></div>
+    </div>
+
+    <section class="panel table-panel">
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr><th>Person</th><th>Role</th><th>Department</th><th>Status</th><th>Joined</th><th class="right">Actions</th></tr>
+          </thead>
+          <tbody>
+            <% people.forEach(p => { const isMe = p._id.toString() === me._id.toString(); %>
+              <tr class="<%= p.active ? '' : 'is-off' %>">
+                <td>
+                  <div class="person">
+                    <span class="avatar avatar-<%= p.role %>"><%= p.name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase() %></span>
+                    <span><strong><%= p.name %><%= isMe ? ' (you)' : '' %></strong><small><%= p.email %></small></span>
+                  </div>
+                </td>
+                <td><span class="pill pill-<%= p.role %>"><%= p.role %></span></td>
+                <td><%= p.department || 'None' %></td>
+                <td><span class="status <%= p.active ? 'on' : 'off' %>"><%= p.active ? 'Active' : 'Deactivated' %></span></td>
+                <td><%= new Date(p.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) %></td>
+                <td class="right">
+                  <% if (!isMe) { %>
+                    <form class="inline" method="post" action="/admin/users/<%= p._id %>/toggle">
+                      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                      <button class="btn btn-small" type="submit"><%= p.active ? 'Deactivate' : 'Activate' %></button>
+                    </form>
+                    <form class="inline" method="post" action="/admin/users/<%= p._id %>/delete" data-confirm="Remove <%= p.name %> permanently?">
+                      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                      <button class="btn btn-small btn-danger" type="submit">Remove</button>
+                    </form>
+                  <% } %>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,13 @@
+<header class="topbar">
+  <a class="brand" href="/">Crewdesk</a>
+  <div class="topbar-right">
+    <span class="who">
+      <span class="avatar"><%= user.name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase() %></span>
+      <span class="who-text"><strong><%= user.name %></strong><small class="role-tag"><%= user.role %></small></span>
+    </span>
+    <form method="post" action="/logout">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <button class="btn btn-ghost" type="submit">Sign out</button>
+    </form>
+  </div>
+</header>

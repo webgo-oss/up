@@ -1,0 +1,64 @@
+<%- include('partials/head') %>
+<body class="auth-page">
+  <%- include('partials/brand-panel') %>
+  <main class="auth-main">
+    <div class="auth-card">
+      <h2>Create your account</h2>
+      <p class="sub">Pick your role first. Admin accounts need an invite code.</p>
+
+      <% if (error) { %><div class="flash flash-error" role="alert"><%= error %></div><% } %>
+
+      <form method="post" action="/register" novalidate>
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+        <fieldset class="role-switch">
+          <legend class="sr-only">Register as</legend>
+          <input type="radio" id="role-employee" name="role" value="employee" <%= role === 'employee' ? 'checked' : '' %>>
+          <label for="role-employee">Employee</label>
+          <input type="radio" id="role-admin" name="role" value="admin" <%= role === 'admin' ? 'checked' : '' %>>
+          <label for="role-admin">Admin</label>
+        </fieldset>
+
+        <div class="field">
+          <label for="name">Full name</label>
+          <input id="name" name="name" type="text" autocomplete="name" required value="<%= form.name || '' %>" placeholder="Asha Verma">
+        </div>
+
+        <div class="field">
+          <label for="email">Work email</label>
+          <input id="email" name="email" type="email" autocomplete="email" required value="<%= form.email || '' %>" placeholder="you@company.com">
+        </div>
+
+        <div class="field only-employee">
+          <label for="department">Department <span class="opt">optional</span></label>
+          <input id="department" name="department" type="text" value="<%= form.department || '' %>" placeholder="Design, Sales, Support...">
+        </div>
+
+        <div class="field only-admin">
+          <label for="adminCode">Admin invite code</label>
+          <input id="adminCode" name="adminCode" type="password" autocomplete="off" placeholder="Ask the person who runs this site">
+        </div>
+
+        <div class="field">
+          <label for="password">Password</label>
+          <div class="pw">
+            <input id="password" name="password" type="password" autocomplete="new-password" required placeholder="8+ characters, a letter and a number">
+            <button type="button" class="pw-toggle" data-toggle="password" aria-label="Show password">Show</button>
+          </div>
+          <div class="meter" id="meter" data-level="0" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+          <small class="hint" id="meter-text">Use a mix of letters, numbers and symbols.</small>
+        </div>
+
+        <div class="field">
+          <label for="confirm">Confirm password</label>
+          <input id="confirm" name="confirm" type="password" autocomplete="new-password" required placeholder="Type it again">
+        </div>
+
+        <button class="btn btn-primary" type="submit">Create account</button>
+      </form>
+
+      <p class="switch">Already registered? <a href="/login" data-keep-role>Sign in</a></p>
+    </div>
+  </main>
+</body>
+</html>

@@ -1,0 +1,26 @@
+<%- include('../partials/head') %>
+<body class="app-page">
+  <%- include('../partials/topbar') %>
+  <main class="wrap">
+    <%- include('../partials/flash') %>
+    <h1 class="page-title">Hi, <%= me.name.split(' ')[0] %>.</h1>
+    <p class="page-sub">This is your workspace.</p>
+
+    <section class="panel">
+      <h2>Your profile</h2>
+      <dl class="details">
+        <div><dt>Name</dt><dd><%= me.name %></dd></div>
+        <div><dt>Email</dt><dd><%= me.email %></dd></div>
+        <div><dt>Department</dt><dd><%= me.department || 'Not set' %></dd></div>
+        <div><dt>Joined</dt><dd><%= new Date(me.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) %></dd></div>
+        <div><dt>Last sign-in</dt><dd><%= me.lastLogin ? new Date(me.lastLogin).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'First visit' %></dd></div>
+      </dl>
+    </section>
+
+    <section class="panel empty">
+      <h2>Your tasks</h2>
+      <p>Nothing assigned yet. When your admin adds tasks, they will show up here.</p>
+    </section>
+  </main>
+</body>
+</html>

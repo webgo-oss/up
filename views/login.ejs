@@ -1,0 +1,43 @@
+<%- include('partials/head') %>
+<body class="auth-page">
+  <%- include('partials/brand-panel') %>
+  <main class="auth-main">
+    <div class="auth-card">
+      <h2>Sign in</h2>
+      <p class="sub">Choose how you use Crewdesk, then enter your details.</p>
+
+      <%- include('partials/flash') %>
+      <% if (error) { %><div class="flash flash-error" role="alert"><%= error %></div><% } %>
+
+      <form method="post" action="/login" novalidate>
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+        <fieldset class="role-switch">
+          <legend class="sr-only">Sign in as</legend>
+          <input type="radio" id="role-employee" name="role" value="employee" <%= role === 'employee' ? 'checked' : '' %>>
+          <label for="role-employee">Employee</label>
+          <input type="radio" id="role-admin" name="role" value="admin" <%= role === 'admin' ? 'checked' : '' %>>
+          <label for="role-admin">Admin</label>
+        </fieldset>
+
+        <div class="field">
+          <label for="email">Work email</label>
+          <input id="email" name="email" type="email" autocomplete="email" required value="<%= form.email || '' %>" placeholder="you@company.com">
+        </div>
+
+        <div class="field">
+          <label for="password">Password</label>
+          <div class="pw">
+            <input id="password" name="password" type="password" autocomplete="current-password" required placeholder="Your password">
+            <button type="button" class="pw-toggle" data-toggle="password" aria-label="Show password">Show</button>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" type="submit">Sign in</button>
+      </form>
+
+      <p class="switch">New here? <a href="/register" data-keep-role>Create an account</a></p>
+    </div>
+  </main>
+</body>
+</html>
