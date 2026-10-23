@@ -1,0 +1,38 @@
+<%- include('partials/head') %>
+<body class="app-page">
+  <%- include('partials/topbar') %>
+  <main class="wrap wide">
+    <%- include('partials/flash') %>
+    <h1 class="page-title">Calendar</h1>
+    <p class="page-sub"><%= intro %></p>
+
+    <div id="cal" data-endpoint="<%= endpoint %>" data-task-base="<%= taskBase %>">
+      <div class="cal-bar">
+        <div class="cal-nav">
+          <button type="button" class="btn btn-small" id="cal-prev" aria-label="Previous month">Prev</button>
+          <button type="button" class="btn btn-small" id="cal-today">Today</button>
+          <button type="button" class="btn btn-small" id="cal-next" aria-label="Next month">Next</button>
+        </div>
+        <h2 class="cal-title" id="cal-title" aria-live="polite"></h2>
+        <div class="cal-legend" id="cal-legend" role="group" aria-label="Show or hide event types"></div>
+      </div>
+
+      <div class="cal-layout">
+        <div class="cal-board">
+          <div class="cal-dow" aria-hidden="true">
+            <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+          </div>
+          <div class="cal-grid" id="cal-grid"></div>
+          <p class="cal-error" id="cal-error" hidden></p>
+        </div>
+
+        <aside class="panel cal-panel" aria-live="polite">
+          <h2 id="cal-day-title">Pick a day</h2>
+          <div id="cal-day-list"></div>
+        </aside>
+      </div>
+    </div>
+  </main>
+  <script src="/js/calendar.js" defer></script>
+</body>
+</html>

@@ -5,11 +5,13 @@
     <nav class="mainnav" aria-label="Main">
       <% if (user.role === 'admin') { %>
         <a href="/admin" class="<%= _nav === 'tasks' ? 'current' : '' %>">Tasks<% if (typeof reviewCount !== 'undefined' && reviewCount > 0) { %> <span class="badge"><%= reviewCount %> to review</span><% } %></a>
+        <a href="/admin/calendar" class="<%= _nav === 'calendar' ? 'current' : '' %>">Calendar</a>
         <a href="/admin/tasks/new" class="<%= _nav === 'new' ? 'current' : '' %>">New task</a>
         <a href="/admin/people" class="<%= _nav === 'people' ? 'current' : '' %>">People</a>
       <% } else { %>
         <a href="/employee" class="<%= _nav === 'available' ? 'current' : '' %>">Available</a>
         <a href="/employee/mine" class="<%= _nav === 'mine' ? 'current' : '' %>">My tasks<% if (typeof redoCount !== 'undefined' && redoCount > 0) { %> <span class="badge"><%= redoCount %> to fix</span><% } %></a>
+        <a href="/employee/calendar" class="<%= _nav === 'calendar' ? 'current' : '' %>">Calendar</a>
       <% } %>
     </nav>
   </div>

@@ -5,6 +5,7 @@ const Task = require('../models/Task');
 const { requireAuth, requireRole } = require('../middleware/auth');
 const { single, removeFile } = require('../lib/upload');
 const { STATUSES } = require('../lib/status');
+const { parseRange, rangeFilter, buildEvents } = require('../lib/calendar');
 
 const router = express.Router();
 router.use(requireAuth, requireRole('admin'));
@@ -157,6 +158,30 @@ router.post('/tasks/:id/delete', async (req, res, next) => {
     await task.deleteOne();
     req.session.flash = { type: 'success', text: 'Task deleted.' };
     res.redirect('/admin');
+  } catch (err) {
+    next(err);
+  }
+});
+
+/* ---------------- Calendar ---------------- */
+
+router.get('/calendar', (req, res) => {
+  res.render('calendar', {
+    title: 'Calendar',
+    nav: 'calendar',
+    endpoint: '/admin/calendar/events',
+    taskBase: '/admin/tasks',
+    intro: 'Every task upload, pick-up, due date, submission and review in one place.',
+  });
+});
+
+router.get('/calendar/events', async (req, res, next) => {
+  try {
+    const range = parseRange(req.query);
+    if (!range) return res.status(400).json({ error: 'Invalid date range' });
+    const tasks = await Task.find(rangeFilter(range)).populate('assignee', 'name').lean();
+    res.set('Cache-Control', 'no-store');
+    res.json(buildEvents(tasks, { ...range, showWho: true }));
   } catch (err) {
     next(err);
   }

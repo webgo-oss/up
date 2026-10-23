@@ -4,6 +4,7 @@ const Task = require('../models/Task');
 const { requireAuth, requireRole } = require('../middleware/auth');
 const { single, removeFile } = require('../lib/upload');
 const { hashtags, keywords } = require('../lib/parse');
+const { parseRange, rangeFilter, buildEvents } = require('../lib/calendar');
 
 const router = express.Router();
 router.use(requireAuth, requireRole('employee'));
@@ -44,6 +45,31 @@ router.get('/mine', async (req, res, next) => {
     const rank = { redo: 0, in_progress: 1, submitted: 2, rejected: 3, approved: 4 };
     tasks.sort((a, b) => rank[a.status] - rank[b.status]);
     res.render('employee/list', { title: 'My tasks', nav: 'mine', mode: 'mine', tasks, mineCount: tasks.length, openCount });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get('/calendar', (req, res) => {
+  res.render('calendar', {
+    title: 'Calendar',
+    nav: 'calendar',
+    endpoint: '/employee/calendar/events',
+    taskBase: '/employee/tasks',
+    intro: 'Due dates for open tasks, plus the dates for everything you have picked up.',
+  });
+});
+
+// Open tasks (anyone can pick them) and this employee's own tasks only
+router.get('/calendar/events', async (req, res, next) => {
+  try {
+    const range = parseRange(req.query);
+    if (!range) return res.status(400).json({ error: 'Invalid date range' });
+    const tasks = await Task.find({
+      $and: [{ $or: [{ status: 'open' }, { assignee: req.user._id }] }, rangeFilter(range)],
+    }).lean();
+    res.set('Cache-Control', 'no-store');
+    res.json(buildEvents(tasks, { ...range, showWho: false }));
   } catch (err) {
     next(err);
   }
