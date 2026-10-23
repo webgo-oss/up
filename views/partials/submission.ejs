@@ -1,0 +1,23 @@
+<article class="submission">
+  <div class="sub-head">
+    <strong>Attempt <%= index + 1 %></strong>
+    <span class="muted">Submitted <%= fmtDateTime(s.submittedAt) %></span>
+  </div>
+  <a class="sub-img" href="/files/<%= s.image %>" target="_blank" rel="noopener">
+    <img src="/files/<%= s.image %>" alt="Submitted work, attempt <%= index + 1 %>">
+  </a>
+  <div class="chips" aria-label="Hashtags">
+    <% s.hashtags.forEach(h => { %><span class="chip">#<%= h %></span><% }) %>
+  </div>
+  <div class="chips" aria-label="Keywords">
+    <% s.keywords.forEach(k => { %><span class="chip chip-kw"><%= k %></span><% }) %>
+  </div>
+  <% if (s.note) { %><p class="sub-note"><%= s.note %></p><% } %>
+  <% if (s.review && s.review.decision) { %>
+    <div class="verdict verdict-<%= s.review.decision %>">
+      <strong><%= { approved: 'Approved', redo: 'Redo requested', rejected: 'Rejected' }[s.review.decision] %></strong>
+      <span class="muted"><%= fmtDateTime(s.review.reviewedAt) %></span>
+      <% if (s.review.comment) { %><p><%= s.review.comment %></p><% } %>
+    </div>
+  <% } %>
+</article>

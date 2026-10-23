@@ -1,0 +1,38 @@
+<%- include('../partials/head') %>
+<body class="app-page">
+  <%- include('../partials/topbar') %>
+  <main class="wrap wide">
+    <%- include('../partials/flash') %>
+    <h1 class="page-title"><%= mode === 'available' ? 'Pick a task' : 'My tasks' %></h1>
+    <p class="page-sub"><%= mode === 'available' ? 'Open tasks from your admin. Choose one to see the brief and claim it.' : 'Everything you have picked up, with the ones that need action first.' %></p>
+
+    <nav class="filters" aria-label="Task lists">
+      <a href="/employee" class="<%= mode === 'available' ? 'current' : '' %>">Available <b><%= openCount %></b></a>
+      <a href="/employee/mine" class="<%= mode === 'mine' ? 'current' : '' %>">My tasks <b><%= mineCount %></b></a>
+    </nav>
+
+    <% if (!tasks.length) { %>
+      <section class="panel empty">
+        <h2><%= mode === 'available' ? 'No open tasks right now' : 'You have not picked any tasks' %></h2>
+        <p><%= mode === 'available' ? 'New tasks appear here as soon as your admin uploads them.' : 'Go to Available and choose a task to start.' %></p>
+        <% if (mode === 'mine') { %><a class="btn btn-accent" href="/employee">See available tasks</a><% } %>
+      </section>
+    <% } else { %>
+      <div class="grid">
+        <% tasks.forEach(t => { %>
+          <a class="task-card" href="/employee/tasks/<%= t._id %>">
+            <img src="/files/<%= t.image %>" alt="">
+            <div class="task-card-body">
+              <strong><%= t.title %></strong>
+              <div class="task-card-meta">
+                <span class="st st-<%= t.status %>"><%= statusLabel(t.status) %></span>
+                <% if (t.dueDate) { %><small>Due <%= fmtDate(t.dueDate) %></small><% } %>
+              </div>
+            </div>
+          </a>
+        <% }) %>
+      </div>
+    <% } %>
+  </main>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<%- include('../partials/head') %>
+<body class="app-page">
+  <%- include('../partials/topbar') %>
+  <main class="wrap wide">
+    <%- include('../partials/flash') %>
+    <div class="page-head">
+      <div>
+        <h1 class="page-title">Tasks</h1>
+        <p class="page-sub">Upload an image, let an employee pick it up, then review what they send back.</p>
+      </div>
+      <a class="btn btn-accent" href="/admin/tasks/new">New task</a>
+    </div>
+
+    <nav class="filters" aria-label="Filter tasks">
+      <a href="/admin" class="<%= filter === 'all' ? 'current' : '' %>">All <b><%= total %></b></a>
+      <% [['submitted'], ['redo'], ['in_progress'], ['open'], ['approved'], ['rejected']].forEach(([s]) => { %>
+        <a href="/admin?status=<%= s %>" class="<%= filter === s ? 'current' : '' %>"><%= statusLabel(s) %> <b><%= counts[s] || 0 %></b></a>
+      <% }) %>
+    </nav>
+
+    <% if (!tasks.length) { %>
+      <section class="panel empty">
+        <h2><%= total ? 'Nothing in this view' : 'No tasks yet' %></h2>
+        <p><%= total ? 'Try another filter above.' : 'Upload the first task image and employees will see it right away.' %></p>
+        <% if (!total) { %><a class="btn btn-accent" href="/admin/tasks/new">Create the first task</a><% } %>
+      </section>
+    <% } else { %>
+      <section class="panel table-panel">
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>Task</th><th>Assigned to</th><th>Status</th><th>Due</th><th>Updated</th></tr></thead>
+            <tbody>
+              <% tasks.forEach(t => { %>
+                <tr>
+                  <td>
+                    <a class="task-cell" href="/admin/tasks/<%= t._id %>">
+                      <img class="thumb" src="/files/<%= t.image %>" alt="">
+                      <span><strong><%= t.title %></strong><small><%= t.submissions.length %> <%= t.submissions.length === 1 ? 'attempt' : 'attempts' %></small></span>
+                    </a>
+                  </td>
+                  <td><%= t.assignee ? t.assignee.name : (t.status === 'open' ? 'Nobody yet' : 'Removed user') %></td>
+                  <td><span class="st st-<%= t.status %>"><%= statusLabel(t.status) %></span></td>
+                  <td><%= t.dueDate ? fmtDate(t.dueDate) : 'No date' %></td>
+                  <td><%= fmtDateTime(t.updatedAt) %></td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    <% } %>
+  </main>
+</body>
+</html>

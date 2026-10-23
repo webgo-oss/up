@@ -1,0 +1,40 @@
+<%- include('../partials/head') %>
+<body class="app-page">
+  <%- include('../partials/topbar') %>
+  <main class="wrap">
+    <%- include('../partials/flash') %>
+    <h1 class="page-title">New task</h1>
+    <p class="page-sub">Employees will see the image and instructions, then send back their own version.</p>
+
+    <% if (error) { %><div class="flash flash-error" role="alert"><%= error %></div><% } %>
+
+    <form class="panel form-panel" method="post" action="/admin/tasks?_csrf=<%= csrfToken %>" enctype="multipart/form-data" novalidate>
+      <div class="field">
+        <label for="title">Title</label>
+        <input id="title" name="title" type="text" maxlength="80" required value="<%= form.title || '' %>" placeholder="Festive sale banner for Instagram">
+      </div>
+
+      <div class="field">
+        <label for="brief">Instructions <span class="opt">optional</span></label>
+        <textarea id="brief" name="brief" rows="4" maxlength="1000" placeholder="Size, tone, colours, anything the employee should match."><%= form.brief || '' %></textarea>
+      </div>
+
+      <div class="field">
+        <label for="dueDate">Due date <span class="opt">optional</span></label>
+        <input id="dueDate" name="dueDate" type="date" value="<%= form.dueDate || '' %>">
+      </div>
+
+      <div class="field">
+        <span class="label">Task image</span>
+        <label class="dropzone" for="image">
+          <input id="image" name="image" type="file" accept="image/jpeg,image/png,image/webp,image/gif" required data-preview="preview">
+          <img id="preview" class="drop-preview" alt="" hidden>
+          <span class="drop-text"><strong>Choose an image</strong><small>JPG, PNG, WebP or GIF, up to 5 MB</small></span>
+        </label>
+      </div>
+
+      <button class="btn btn-primary" type="submit">Publish task</button>
+    </form>
+  </main>
+</body>
+</html>

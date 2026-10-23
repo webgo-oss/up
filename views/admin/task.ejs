@@ -1,0 +1,70 @@
+<%- include('../partials/head') %>
+<body class="app-page">
+  <%- include('../partials/topbar') %>
+  <main class="wrap wide">
+    <%- include('../partials/flash') %>
+    <a class="back" href="/admin">All tasks</a>
+    <div class="page-head">
+      <div>
+        <h1 class="page-title"><%= task.title %></h1>
+        <p class="page-sub">
+          <span class="st st-<%= task.status %>"><%= statusLabel(task.status) %></span>
+          <% if (task.assignee) { %> &nbsp;Assigned to <strong><%= task.assignee.name %></strong><% } %>
+          <% if (task.dueDate) { %> &nbsp;Due <%= fmtDate(task.dueDate) %><% } %>
+        </p>
+      </div>
+    </div>
+
+    <div class="split">
+      <section class="panel">
+        <h2>The task</h2>
+        <a href="/files/<%= task.image %>" target="_blank" rel="noopener"><img class="ref-img" src="/files/<%= task.image %>" alt="Task image for <%= task.title %>"></a>
+        <p class="brief"><%= task.brief || 'No written instructions.' %></p>
+
+        <div class="actions">
+          <% if (['in_progress', 'redo', 'rejected'].includes(task.status)) { %>
+            <form class="inline" method="post" action="/admin/tasks/<%= task._id %>/reopen" data-confirm="Take this away from the employee and open it for everyone?">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button class="btn btn-small" type="submit">Open for everyone</button>
+            </form>
+          <% } %>
+          <form class="inline" method="post" action="/admin/tasks/<%= task._id %>/delete" data-confirm="Delete this task and all submitted work?">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <button class="btn btn-small btn-danger" type="submit">Delete task</button>
+          </form>
+        </div>
+      </section>
+
+      <section>
+        <% if (!task.submissions.length) { %>
+          <div class="panel empty">
+            <h2>No work submitted yet</h2>
+            <p><%= task.status === 'open' ? 'No employee has picked this task up.' : (task.assignee ? task.assignee.name : 'The employee') + ' is working on it.' %></p>
+          </div>
+        <% } else { %>
+          <% task.submissions.slice().reverse().forEach((s, i) => { const index = task.submissions.length - 1 - i; %>
+            <div class="panel">
+              <%- include('../partials/submission', { s, index }) %>
+
+              <% if (task.status === 'submitted' && index === task.submissions.length - 1) { %>
+                <form class="review" method="post" action="/admin/tasks/<%= task._id %>/review">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                  <div class="field">
+                    <label for="comment">Feedback</label>
+                    <textarea id="comment" name="comment" rows="3" maxlength="1000" placeholder="Required for redo and reject. Say exactly what to change, for example: use the brand blue and move the logo to the top left."></textarea>
+                  </div>
+                  <div class="review-buttons">
+                    <button class="btn btn-ok" type="submit" name="decision" value="approve">Approve</button>
+                    <button class="btn btn-warn" type="submit" name="decision" value="redo">Ask for redo</button>
+                    <button class="btn btn-danger" type="submit" name="decision" value="reject">Reject</button>
+                  </div>
+                </form>
+              <% } %>
+            </div>
+          <% }) %>
+        <% } %>
+      </section>
+    </div>
+  </main>
+</body>
+</html>

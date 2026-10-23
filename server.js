@@ -31,13 +31,20 @@ app.use(
         scriptSrc: ["'self'"],
         styleSrc: ["'self'", 'https://fonts.googleapis.com'],
         fontSrc: ["'self'", 'https://fonts.gstatic.com'],
-        imgSrc: ["'self'", 'data:'],
+        imgSrc: ["'self'", 'data:', 'blob:'],
         formAction: ["'self'"],
         frameAncestors: ["'none'"],
       },
     },
   })
 );
+
+const { STATUS_LABEL } = require('./lib/status');
+app.locals.statusLabel = (s) => STATUS_LABEL[s] || s;
+app.locals.fmtDate = (d) =>
+  d ? new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+app.locals.fmtDateTime = (d) =>
+  d ? new Date(d).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '';
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -71,7 +78,8 @@ app.use((req, res, next) => {
 // CSRF check for every state-changing request
 app.use((req, res, next) => {
   if (req.method !== 'POST') return next();
-  const sent = Buffer.from(String(req.body._csrf || ''));
+  // Multipart forms (file uploads) pass the token in the query string because the body is parsed later
+  const sent = Buffer.from(String((req.body && req.body._csrf) || req.query._csrf || ''));
   const real = Buffer.from(req.session.csrf);
   if (sent.length !== real.length || !crypto.timingSafeEqual(sent, real)) {
     return res.status(403).render('error', {
@@ -84,6 +92,7 @@ app.use((req, res, next) => {
 });
 
 app.use('/', require('./routes/auth'));
+app.use('/files', require('./routes/files'));
 app.use('/admin', require('./routes/admin'));
 app.use('/employee', require('./routes/employee'));
 

@@ -1,0 +1,103 @@
+<%- include('../partials/head') %>
+<body class="app-page">
+  <%- include('../partials/topbar') %>
+  <main class="wrap wide">
+    <%- include('../partials/flash') %>
+    <a class="back" href="<%= mine ? '/employee/mine' : '/employee' %>"><%= mine ? 'My tasks' : 'Available tasks' %></a>
+    <div class="page-head">
+      <div>
+        <h1 class="page-title"><%= task.title %></h1>
+        <p class="page-sub">
+          <span class="st st-<%= task.status %>"><%= statusLabel(task.status) %></span>
+          <% if (task.dueDate) { %> &nbsp;Due <%= fmtDate(task.dueDate) %><% } %>
+        </p>
+      </div>
+    </div>
+
+    <% const last = task.submissions[task.submissions.length - 1]; %>
+    <% if (task.status === 'redo' && last && last.review) { %>
+      <div class="callout callout-redo">
+        <strong>Your admin asked for changes</strong>
+        <p><%= last.review.comment %></p>
+      </div>
+    <% } else if (task.status === 'rejected' && last && last.review) { %>
+      <div class="callout callout-rejected">
+        <strong>This task was rejected</strong>
+        <p><%= last.review.comment %></p>
+      </div>
+    <% } else if (task.status === 'approved') { %>
+      <div class="callout callout-approved"><strong>Approved. Nice work.</strong></div>
+    <% } else if (task.status === 'submitted') { %>
+      <div class="callout callout-submitted"><strong>Waiting for review</strong><p>You will see the decision here.</p></div>
+    <% } %>
+
+    <div class="split">
+      <section class="panel">
+        <h2>The brief</h2>
+        <a href="/files/<%= task.image %>" target="_blank" rel="noopener"><img class="ref-img" src="/files/<%= task.image %>" alt="Task image for <%= task.title %>"></a>
+        <p class="brief"><%= task.brief || 'No written instructions. Use your judgement.' %></p>
+
+        <% if (task.status === 'open') { %>
+          <form method="post" action="/employee/tasks/<%= task._id %>/claim">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <button class="btn btn-primary" type="submit">Pick this task</button>
+          </form>
+        <% } else if (task.status === 'in_progress') { %>
+          <form method="post" action="/employee/tasks/<%= task._id %>/release" data-confirm="Give this task back so someone else can take it?">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <button class="btn btn-small" type="submit">Give it back</button>
+          </form>
+        <% } %>
+      </section>
+
+      <section>
+        <% if (canSubmit) { %>
+          <form class="panel form-panel" method="post" action="/employee/tasks/<%= task._id %>/submit?_csrf=<%= csrfToken %>" enctype="multipart/form-data" novalidate>
+            <h2><%= task.status === 'redo' ? 'Submit your updated work' : 'Submit your work' %></h2>
+            <% if (error) { %><div class="flash flash-error" role="alert"><%= error %></div><% } %>
+
+            <div class="field">
+              <span class="label">Your image</span>
+              <label class="dropzone" for="image">
+                <input id="image" name="image" type="file" accept="image/jpeg,image/png,image/webp,image/gif" required data-preview="preview">
+                <img id="preview" class="drop-preview" alt="" hidden>
+                <span class="drop-text"><strong>Choose your finished image</strong><small>JPG, PNG, WebP or GIF, up to 5 MB</small></span>
+              </label>
+            </div>
+
+            <div class="field">
+              <label for="hashtags">Hashtags</label>
+              <input id="hashtags" name="hashtags" type="text" required value="<%= form.hashtags || '' %>" placeholder="#festive #sale #newcollection" data-chips="hashtag-preview" data-prefix="#">
+              <div class="chips chips-preview" id="hashtag-preview"></div>
+              <small class="hint">Separate with spaces or commas. Up to 15.</small>
+            </div>
+
+            <div class="field">
+              <label for="keywords">Keywords</label>
+              <input id="keywords" name="keywords" type="text" required value="<%= form.keywords || '' %>" placeholder="festive sale, red dress, banner" data-chips="keyword-preview" data-split="comma">
+              <div class="chips chips-preview" id="keyword-preview"></div>
+              <small class="hint">Separate with commas. Up to 20.</small>
+            </div>
+
+            <div class="field">
+              <label for="note">Note to admin <span class="opt">optional</span></label>
+              <textarea id="note" name="note" rows="3" maxlength="500" placeholder="Anything the reviewer should know."><%= form.note || '' %></textarea>
+            </div>
+
+            <button class="btn btn-primary" type="submit">Submit for review</button>
+          </form>
+        <% } %>
+
+        <% if (task.submissions.length) { %>
+          <h2 class="section-title"><%= canSubmit ? 'Earlier attempts' : 'Your submissions' %></h2>
+          <% task.submissions.slice().reverse().forEach((s, i) => { const index = task.submissions.length - 1 - i; %>
+            <div class="panel"><%- include('../partials/submission', { s, index }) %></div>
+          <% }) %>
+        <% } else if (!canSubmit) { %>
+          <div class="panel empty"><h2>No work yet</h2><p>Pick this task to start. Your submission form will appear here.</p></div>
+        <% } %>
+      </section>
+    </div>
+  </main>
+</body>
+</html>

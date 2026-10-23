@@ -45,6 +45,42 @@
     });
   }
 
+
+  // Live preview of the chosen image
+  document.querySelectorAll('input[data-preview]').forEach(function (input) {
+    input.addEventListener('change', function () {
+      var img = document.getElementById(input.getAttribute('data-preview'));
+      var file = input.files && input.files[0];
+      if (!img) return;
+      if (!file) { img.hidden = true; return; }
+      img.src = URL.createObjectURL(file);
+      img.hidden = false;
+      var label = input.closest('.dropzone');
+      if (label) label.querySelector('.drop-text strong').textContent = file.name;
+    });
+  });
+
+  // Live chip preview for hashtag / keyword fields
+  document.querySelectorAll('input[data-chips]').forEach(function (input) {
+    var box = document.getElementById(input.getAttribute('data-chips'));
+    var prefix = input.getAttribute('data-prefix') || '';
+    var comma = input.getAttribute('data-split') === 'comma';
+    function render() {
+      var parts = input.value.split(comma ? /,/ : /[\s,]+/).map(function (t) {
+        return t.trim().replace(/^#+/, '');
+      }).filter(Boolean);
+      box.textContent = '';
+      parts.slice(0, comma ? 20 : 15).forEach(function (t) {
+        var chip = document.createElement('span');
+        chip.className = 'chip' + (comma ? ' chip-kw' : '');
+        chip.textContent = prefix + t;
+        box.appendChild(chip);
+      });
+    }
+    input.addEventListener('input', render);
+    render();
+  });
+
   // Confirm before destructive actions
   document.querySelectorAll('form[data-confirm]').forEach(function (form) {
     form.addEventListener('submit', function (e) {
