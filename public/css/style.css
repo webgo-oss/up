@@ -367,3 +367,7 @@ tr.is-off td:last-child { opacity: 1; }
   .cal-chip-text, .cal-more { display: none; }
   .cal-dow span { padding: 0.5rem 0; font-size: 0.72rem; }
 }
+
+/* Redo due date */
+.field-date { max-width: 260px; }
+.verdict .verdict-due { margin-top: 0.4rem; }

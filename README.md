@@ -17,7 +17,7 @@ Open http://localhost:3000
 1. **Admin** uploads a task (image, optional instructions and due date) under *New task*.
 2. **Employees** see it under *Available*, open it and press *Pick this task*. Only one employee can claim a task.
 3. The employee submits their finished image plus **hashtags** and **keywords** (and an optional note).
-4. **Admin** reviews on the task page and chooses **Approve**, **Ask for redo** or **Reject**. Redo and reject need written feedback.
+4. **Admin** reviews on the task page and chooses **Approve**, **Ask for redo** or **Reject**. Redo and reject need written feedback. A redo can also set a new due date (or keep the current one).
 5. After a redo the employee sees the feedback at the top of the task and submits a new attempt. Every attempt and verdict is kept in the history.
 
 ## Calendar

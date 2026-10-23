@@ -53,6 +53,11 @@
                     <label for="comment">Feedback</label>
                     <textarea id="comment" name="comment" rows="3" maxlength="1000" placeholder="Required for redo and reject. Say exactly what to change, for example: use the brand blue and move the logo to the top left."></textarea>
                   </div>
+                  <div class="field field-date">
+                    <label for="reviewDue">Due date for the redo <span class="opt">optional</span></label>
+                    <input id="reviewDue" name="dueDate" type="date" value="<%= task.dueDate ? task.dueDate.toISOString().slice(0, 10) : '' %>">
+                    <small class="hint"><%= task.dueDate ? 'Currently ' + fmtDate(task.dueDate) + '. Keep it, or pick a later day to give more time.' : 'No due date set. Pick one if the redo has a deadline.' %> Only used when you ask for a redo.</small>
+                  </div>
                   <div class="review-buttons">
                     <button class="btn btn-ok" type="submit" name="decision" value="approve">Approve</button>
                     <button class="btn btn-warn" type="submit" name="decision" value="redo">Ask for redo</button>

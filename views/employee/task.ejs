@@ -19,6 +19,7 @@
       <div class="callout callout-redo">
         <strong>Your admin asked for changes</strong>
         <p><%= last.review.comment %></p>
+        <% if (last.review.newDueDate) { %><p>New due date: <strong><%= fmtDate(last.review.newDueDate) %></strong></p><% } %>
       </div>
     <% } else if (task.status === 'rejected' && last && last.review) { %>
       <div class="callout callout-rejected">

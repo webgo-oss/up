@@ -5,6 +5,7 @@ const Task = require('../models/Task');
 const { requireAuth, requireRole } = require('../middleware/auth');
 const { single, removeFile } = require('../lib/upload');
 const { STATUSES } = require('../lib/status');
+const { day } = require('../lib/parse');
 const { parseRange, rangeFilter, buildEvents } = require('../lib/calendar');
 
 const router = express.Router();
@@ -117,14 +118,34 @@ router.post('/tasks/:id/review', async (req, res, next) => {
       return res.redirect(back);
     }
 
+    // Optional on a redo: leave the date alone, or move it. Ignored for approve and reject.
+    let newDue = null;
+    if (decision === 'redo' && String(req.body.dueDate || '').trim()) {
+      newDue = day(req.body.dueDate);
+      const today = day(new Date().toISOString().slice(0, 10));
+      if (!newDue) {
+        req.session.flash = { type: 'error', text: 'That due date is not valid.' };
+        return res.redirect(back);
+      }
+      if (newDue < today) {
+        req.session.flash = { type: 'error', text: 'Pick a due date from today onwards.' };
+        return res.redirect(back);
+      }
+    }
+    const changed = newDue && (!task.dueDate || +task.dueDate !== +newDue);
+
     const latest = task.submissions[task.submissions.length - 1];
     latest.review = { decision, comment, reviewedAt: new Date() };
+    if (changed) {
+      latest.review.newDueDate = newDue;
+      task.dueDate = newDue;
+    }
     task.status = decision;
     await task.save();
 
     req.session.flash = {
       type: 'success',
-      text: { approved: 'Approved.', redo: 'Sent back for a redo.', rejected: 'Rejected.' }[decision],
+      text: { approved: 'Approved.', redo: changed ? 'Sent back for a redo with a new due date.' : 'Sent back for a redo.', rejected: 'Rejected.' }[decision],
     };
     res.redirect(back);
   } catch (err) {

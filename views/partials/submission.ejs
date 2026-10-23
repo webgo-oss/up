@@ -18,6 +18,7 @@
       <strong><%= { approved: 'Approved', redo: 'Redo requested', rejected: 'Rejected' }[s.review.decision] %></strong>
       <span class="muted"><%= fmtDateTime(s.review.reviewedAt) %></span>
       <% if (s.review.comment) { %><p><%= s.review.comment %></p><% } %>
+      <% if (s.review.newDueDate) { %><p class="verdict-due">New due date: <strong><%= fmtDate(s.review.newDueDate) %></strong></p><% } %>
     </div>
   <% } %>
 </article>

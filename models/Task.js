@@ -11,6 +11,7 @@ const submissionSchema = new Schema({
     decision: { type: String, enum: ['approved', 'redo', 'rejected'] },
     comment: { type: String, default: '', maxlength: 1000 },
     reviewedAt: Date,
+    newDueDate: Date, // set when a redo also moved the deadline
   },
 });
 
